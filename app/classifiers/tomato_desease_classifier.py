@@ -152,7 +152,7 @@ class TomatoDeseaseClassifier:
         return predictions
     
 
-    def predict_img(self, image: Image, top_k=3) -> Dict[str, float]:
+    def predict_img(self, image: Image, top_k=Config.NUM_CLASSES) -> Dict[str, float]:
         # Transform
         input_tensor = self.transform(image)
         input_batch = input_tensor.unsqueeze(0)  # Add batch dimension (1, 3, 224, 224)

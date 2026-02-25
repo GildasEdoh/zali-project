@@ -34,11 +34,11 @@ PLANT_DISEASES = {
         ]
     }
 
-PLANT_MODEL_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models/best_plant_classifier.pth"
-DISEASE_MODELS_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models"
+PLANT_MODEL_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models-cleaned/best_plant_classifier_clean.pth"
+DISEASE_MODELS_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models-cleaned"
 
-APPLE_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models/apple_best_plant_classifier.pth"
-CORN_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models/maize_best_plant_classifier.pth"
-PEPPER_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models/pepper_best_plant_classifier.pth"
-TOMATO_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models/tomato_best_desease_classifier.pth"
-POTATO_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models/potato_best_plant_classifier.pth"
+APPLE_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models-cleaned/apple_best_plant_classifier_clean.pth"
+CORN_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models-cleaned/maize_best_plant_classifier_clean.pth"
+PEPPER_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models-cleaned/pepper_best_plant_classifier_clean.pth"
+TOMATO_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models-cleaned/tomato_best_plant_classifier_clean.pth"
+POTATO_CLASSIFIER_PATH = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models-cleaned/potato_best_plant_classifier_clean.pth"

@@ -146,7 +146,7 @@ class PlantClassifier:
         return predictions
     
 
-    def predict_img(self, image: Image, top_k=3) -> dict:
+    def predict_img(self, image: Image, top_k=5) -> dict:
         # Transform
         input_tensor = self.transform(image)
         input_batch = input_tensor.unsqueeze(0)  # Add batch dimension (1, 3, 224, 224)

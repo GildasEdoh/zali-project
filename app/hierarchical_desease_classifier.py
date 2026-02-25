@@ -1,9 +1,9 @@
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional
 from PIL import Image
-from constants import PLANT_DISEASES, APPLE_CLASSIFIER_PATH, CORN_CLASSIFIER_PATH, PEPPER_CLASSIFIER_PATH, POTATO_CLASSIFIER_PATH, TOMATO_CLASSIFIER_PATH
+from constants import *
 from classifiers.plant_classifier import get_classifier, PlantClassifier
 from classifiers import get_potato_classifier, get_apple_classifier, get_corn_classifier, get_pepper_classifier, get_tomato_classifier
-from classifiers import PotatoDeseaseClassifier, AppleDeseaseClassifier, TomatoDeseaseClassifier, CornDeseaseClassifier, PepperDeseaseClassifier
+from classifiers import PotatoDeseaseClassifier, AppleDeseaseClassifier, TomatoDeseaseClassifier, CornDeseaseClassifier, PepperDeseaseClassifier        
 
 class HierarchicalPlantDiseaseDetector:
     """
@@ -54,6 +54,7 @@ class HierarchicalPlantDiseaseDetector:
     def predict_desease(self, image: Image) -> Dict[str, float]:
         prediction_result = self.plant_classifier.predict_img(image)
         predicted_plant_name = self.get_max_prob_name(prediction_result)
+        print("plante predite: ", predicted_plant_name)
 
         if predicted_plant_name == "Apple":
             desease_results = self.apple_classifier.predict_img(image)
@@ -63,7 +64,7 @@ class HierarchicalPlantDiseaseDetector:
             desease_results = self.potato_classifier.predict_img(image)
         elif predicted_plant_name == "Corn_(maize)":
             desease_results = self.corn_classifier.predict_img(image)
-        elif predicted_plant_name == "Pepper":
+        elif predicted_plant_name == "Pepper__bell":
             desease_results = self.pepper_classifier.predict_img(image)
         else:
             desease_results = {}
@@ -78,3 +79,14 @@ class HierarchicalPlantDiseaseDetector:
                 max_prob = prob
                 predicted_plant_name = plant_name
         return predicted_plant_name
+
+
+_desease_classifier : Optional[HierarchicalPlantDiseaseDetector] = None
+
+def get_desease_classifier():
+    global _desease_classifier
+    if _desease_classifier is None:
+        _desease_classifier = HierarchicalPlantDiseaseDetector(PLANT_MODEL_PATH, DISEASE_MODELS_PATH)
+    return _desease_classifier
+
+    

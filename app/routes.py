@@ -10,6 +10,7 @@ from PIL import Image
 
 from hierarchical_desease_classifier import HierarchicalPlantDiseaseDetector
 from classifiers.plant_classifier import get_classifier, PlantClassifier
+from hierarchical_desease_classifier import get_desease_classifier
 from constants import PLANT_MODEL_PATH, DISEASE_MODELS_PATH
 
 # ============================================================
@@ -29,12 +30,8 @@ detector: HierarchicalPlantDiseaseDetector = None
 # ============================================================
 @router.on_event("startup")
 def load_model():
-    global detector, sample_classifier
+    global detector
     print("Loading models...")
-    detector = HierarchicalPlantDiseaseDetector(
-        PLANT_MODEL_PATH,
-        DISEASE_MODELS_PATH
-    )
     print("Models loaded successfully!")
 
 # ============================================================
@@ -58,47 +55,48 @@ def system_info():
     }
 
 
-@router.get("/predict_plant_class")
+@router.post("/predict_plant_class")
 async def predict_plant_class(file: UploadFile = File(...)):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
     
     contents = await file.read()
     image = Image.open(BytesIO(contents)).convert("RGB")
-    sample_classifier : PlantClassifier = get_classifier()
+    sample_classifier : PlantClassifier = get_classifier(PLANT_MODEL_PATH)
     result = sample_classifier.predict_img(image)
     return JSONResponse(content=result)
 
 @router.post("/predict_plant_desease")
-async def predict(file: UploadFile = File(...)):
+async def predict_plant_desease(file: UploadFile = File(...)):
     if not file.content_type.startswith("image/"):
         raise HTTPException(status_code=400, detail="File must be an image")
 
     contents = await file.read()
     image = Image.open(BytesIO(contents)).convert("RGB")
-    result = detector.predict(image)
+    detector : HierarchicalPlantDiseaseDetector = get_desease_classifier()
+    result = detector.predict_desease(image)
 
     return JSONResponse(content=result)
 
 
-@router.post("/predict-batch")
-async def predict_batch(files: List[UploadFile] = File(...)):
-    results = []
-    for file in files:
-        contents = await file.read()
-        image = Image.open(BytesIO(contents)).convert("RGB")
-        result = detector.predict(image)
-        results.append(result)
-    return JSONResponse(content=results)
+# @router.post("/predict-batch")
+# async def predict_batch(files: List[UploadFile] = File(...)):
+#     results = []
+#     for file in files:
+#         contents = await file.read()
+#         image = Image.open(BytesIO(contents)).convert("RGB")
+#         result = detector.predict(image)
+#         results.append(result)
+#     return JSONResponse(content=results)
 
 
-@router.post("/predict-base64")
-def predict_base64(data: Base64Image):
-    try:
-        image_data = base64.b64decode(data.image)
-        image = Image.open(BytesIO(image_data)).convert("RGB")
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid base64 image")
+# @router.post("/predict-base64")
+# def predict_base64(data: Base64Image):
+#     try:
+#         image_data = base64.b64decode(data.image)
+#         image = Image.open(BytesIO(image_data)).convert("RGB")
+#     except Exception:
+#         raise HTTPException(status_code=400, detail="Invalid base64 image")
 
-    result = detector.predict(image)
-    return JSONResponse(content=result)
+#     result = detector.predict(image)
+#     return JSONResponse(content=result)
