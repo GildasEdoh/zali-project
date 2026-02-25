@@ -1,0 +1,5 @@
+from apple_desease_classifier import get_apple_classifier, AppleDeseaseClassifier
+from pepper_desease_classifier import get_pepper_classifier, PepperDeseaseClassifier
+from tomato_desease_classifier import get_tomato_classifier, TomatoDeseaseClassifier
+from corn_desease_classifier import get_corn_classifier, CornDeseaseClassifier
+from potato_desease_classifier import get_potato_classifier, PotatoDeseaseClassifier

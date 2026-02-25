@@ -5,6 +5,7 @@ Load trained model and predict on single images
 
 import torch
 import torch.nn as nn
+from typing import Tuple, Dict
 from torchvision import models, transforms
 from PIL import Image
 import sys
@@ -149,7 +150,7 @@ class PepperDeseaseClassifier:
         return predictions
     
 
-    def predict_img(self, image: Image):
+    def predict_img(self, image: Image, top_k=3) -> Dict[str, float]:
         # Transform
         input_tensor = self.transform(image)
         input_batch = input_tensor.unsqueeze(0)  # Add batch dimension (1, 3, 224, 224)
@@ -163,10 +164,10 @@ class PepperDeseaseClassifier:
         # Get top K predictions
         top_prob, top_idx = torch.topk(probabilities, top_k)
         
-        predictions = []
+        predictions = {}
         for prob, idx in zip(top_prob, top_idx):
             class_name = self.idx_to_class[idx.item()]
-            predictions.append((class_name, prob.item()))
+            predictions[class_name] = prob.item()
         
         return predictions
     
@@ -204,7 +205,7 @@ class PepperDeseaseClassifier:
 
 _pepper_desease_classifier : Optional[PepperDeseaseClassifier] = None
 
-def get_classifier(model_path) -> PepperDeseaseClassifier:
+def get_pepper_classifier(model_path) -> PepperDeseaseClassifier:
     global _pepper_desease_classifier
     if _pepper_desease_classifier is None:
         _pepper_desease_classifier = PepperDeseaseClassifier(model_path)

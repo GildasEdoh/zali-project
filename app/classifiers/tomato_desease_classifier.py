@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from typing import Dict
 from torchvision import models, transforms
 from PIL import Image
 import sys
@@ -151,7 +152,7 @@ class TomatoDeseaseClassifier:
         return predictions
     
 
-    def predict_img(self, image: Image):
+    def predict_img(self, image: Image, top_k=3) -> Dict[str, float]:
         # Transform
         input_tensor = self.transform(image)
         input_batch = input_tensor.unsqueeze(0)  # Add batch dimension (1, 3, 224, 224)
@@ -165,10 +166,10 @@ class TomatoDeseaseClassifier:
         # Get top K predictions
         top_prob, top_idx = torch.topk(probabilities, top_k)
         
-        predictions = []
+        predictions = {}
         for prob, idx in zip(top_prob, top_idx):
             class_name = self.idx_to_class[idx.item()]
-            predictions.append((class_name, prob.item()))
+            predictions[class_name] = prob.item()
         
         return predictions
     
@@ -206,7 +207,7 @@ class TomatoDeseaseClassifier:
 
 _tomato_desease_classifier : Optional[TomatoDeseaseClassifier] = None
 
-def get_classifier(model_path) -> TomatoDeseaseClassifier:
+def get_tomato_classifier(model_path) -> TomatoDeseaseClassifier:
     global _tomato_desease_classifier
     if _tomato_desease_classifier is None:
         _tomato_desease_classifier = TomatoDeseaseClassifier(model_path)
@@ -226,7 +227,7 @@ if __name__ == '__main__':
     #     sys.exit(1)
     
     image_path = "/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/images/005318c8-a5fa-4420-843b-23bdda7322c2___RS_NLB 3853 copy.jpg"
-    model_path = '/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models/best_tomato_desease_classifier.pth'
+    model_path = '/Users/v9/Documents/Documents personnels EDOH Yao Gildas/agriVision/app/models/tomato_best_desease_classifier.pth'
     
     # Create classifier
     classifier = TomatoDeseaseClassifier(model_path)

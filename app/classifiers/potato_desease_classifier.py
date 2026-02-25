@@ -1,9 +1,6 @@
-
-
-
-
 import torch
 import torch.nn as nn
+from typing import Dict
 from torchvision import models, transforms
 from PIL import Image
 import sys
@@ -149,7 +146,7 @@ class PotatoDeseaseClassifier:
         return predictions
     
 
-    def predict_img(self, image: Image):
+    def predict_img(self, image: Image, top_k=3) -> Dict[str, float]:
         # Transform
         input_tensor = self.transform(image)
         input_batch = input_tensor.unsqueeze(0)  # Add batch dimension (1, 3, 224, 224)
@@ -163,10 +160,10 @@ class PotatoDeseaseClassifier:
         # Get top K predictions
         top_prob, top_idx = torch.topk(probabilities, top_k)
         
-        predictions = []
+        predictions = {}
         for prob, idx in zip(top_prob, top_idx):
             class_name = self.idx_to_class[idx.item()]
-            predictions.append((class_name, prob.item()))
+            predictions[class_name] = prob.item()
         
         return predictions
     
@@ -204,7 +201,7 @@ class PotatoDeseaseClassifier:
 
 _potato_desease_classifier : Optional[PotatoDeseaseClassifier] = None
 
-def get_classifier(model_path) -> PotatoDeseaseClassifier:
+def get_potato_classifier(model_path) -> PotatoDeseaseClassifier:
     global _potato_desease_classifier
     if _potato_desease_classifier is None:
         _potato_desease_classifier = PotatoDeseaseClassifier(model_path)

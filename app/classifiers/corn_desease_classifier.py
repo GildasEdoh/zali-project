@@ -4,6 +4,7 @@
 import torch
 import torch.nn as nn
 from torchvision import models, transforms
+from typing import Tuple, Dict
 from PIL import Image
 import sys
 import matplotlib.pyplot as plt
@@ -149,7 +150,7 @@ class CornDeseaseClassifier:
         return predictions
     
 
-    def predict_img(self, image: Image):
+    def predict_img(self, image: Image, top_k=3) -> Dict[str, float]:
         # Transform
         input_tensor = self.transform(image)
         input_batch = input_tensor.unsqueeze(0)  # Add batch dimension (1, 3, 224, 224)
@@ -163,10 +164,10 @@ class CornDeseaseClassifier:
         # Get top K predictions
         top_prob, top_idx = torch.topk(probabilities, top_k)
         
-        predictions = []
+        predictions = {}
         for prob, idx in zip(top_prob, top_idx):
             class_name = self.idx_to_class[idx.item()]
-            predictions.append((class_name, prob.item()))
+            predictions[class_name] = prob.item()
         
         return predictions
     
@@ -204,7 +205,7 @@ class CornDeseaseClassifier:
 
 _corn_desease_classifier : Optional[CornDeseaseClassifier] = None
 
-def get_classifier(model_path) -> CornDeseaseClassifier:
+def get_corn_classifier(model_path) -> CornDeseaseClassifier:
     global _corn_desease_classifier
     if _corn_desease_classifier is None:
         _corn_desease_classifier = CornDeseaseClassifier(model_path)

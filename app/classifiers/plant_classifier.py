@@ -138,15 +138,15 @@ class PlantClassifier:
         # Get top K predictions
         top_prob, top_idx = torch.topk(probabilities, top_k)
         
-        predictions = []
+        predictions = {}
         for prob, idx in zip(top_prob, top_idx):
             class_name = self.idx_to_class[idx.item()]
-            predictions.append((class_name, prob.item()))
+            predictions[class_name] = prob.item()
         
         return predictions
     
 
-    def predict_img(self, image: Image):
+    def predict_img(self, image: Image, top_k=3) -> dict:
         # Transform
         input_tensor = self.transform(image)
         input_batch = input_tensor.unsqueeze(0)  # Add batch dimension (1, 3, 224, 224)
@@ -160,10 +160,10 @@ class PlantClassifier:
         # Get top K predictions
         top_prob, top_idx = torch.topk(probabilities, top_k)
         
-        predictions = []
+        predictions = {}
         for prob, idx in zip(top_prob, top_idx):
             class_name = self.idx_to_class[idx.item()]
-            predictions.append((class_name, prob.item()))
+            predictions[class_name] = prob.item()
         
         return predictions
     

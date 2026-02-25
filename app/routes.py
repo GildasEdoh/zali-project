@@ -10,6 +10,7 @@ from PIL import Image
 
 from hierarchical_desease_classifier import HierarchicalPlantDiseaseDetector
 from classifiers.plant_classifier import get_classifier, PlantClassifier
+from constants import PLANT_MODEL_PATH, DISEASE_MODELS_PATH
 
 # ============================================================
 # Router
@@ -19,8 +20,7 @@ router = APIRouter()
 # ============================================================
 # Configuration / Model paths
 # ============================================================
-PLANT_MODEL_PATH = "app/models/best_plant_classifier.pth"
-DISEASE_MODELS_PATH = os.environ.get("DISEASE_MODELS_PATH", "disease_models")
+
 
 detector: HierarchicalPlantDiseaseDetector = None
 
