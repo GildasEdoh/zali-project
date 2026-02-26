@@ -25,7 +25,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://zaliapp.vercel.app/"
+        "https://zaliapp.vercel.app"
     ],
     allow_credentials=False,  # Must be False when not using specific credentials
     allow_methods=["*"],
