@@ -1,3 +1,4 @@
+IMG_SIZE = (256, 256)
 PLANT_DISEASES = {
         'Apple': [
             'Apple___Black_rot',

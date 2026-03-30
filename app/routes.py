@@ -1,22 +1,37 @@
 import os
+import io
 import base64
 from io import BytesIO
 from typing import List
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+import uuid
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 from PIL import Image
+from datetime import datetime
 
 from hierarchical_desease_classifier import HierarchicalPlantDiseaseDetector
 from classifiers.plant_classifier import get_classifier, PlantClassifier
 from hierarchical_desease_classifier import get_desease_classifier
-from constants import PLANT_MODEL_PATH, DISEASE_MODELS_PATH
+from constants import PLANT_MODEL_PATH, DISEASE_MODELS_PATH, IMG_SIZE
+from schemas import LeafSchema
+from dotenv import load_dotenv
+
+from supabase import create_client, Client
+import os
 
 # ============================================================
 # Router
 # ============================================================
+load_dotenv()
 router = APIRouter()
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+print("SUPABASE_URL", SUPABASE_URL)
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ============================================================
 # Configuration / Model paths
@@ -79,24 +94,88 @@ async def predict_plant_desease(file: UploadFile = File(...)):
     return JSONResponse(content=result)
 
 
-# @router.post("/predict-batch")
-# async def predict_batch(files: List[UploadFile] = File(...)):
-#     results = []
-#     for file in files:
-#         contents = await file.read()
-#         image = Image.open(BytesIO(contents)).convert("RGB")
-#         result = detector.predict(image)
-#         results.append(result)
-#     return JSONResponse(content=results)
+@router.post("/upload_leaf")
+async def upload_leaf(
+    plant_type: str = Form(...),
+    disease_label: str = Form(None),
+    health_status: str = Form(None),
+
+    gps_lat: float = Form(None),
+    gps_lon: float = Form(None),
+    location_name: str = Form(None),
+
+    collector_id: str = Form(None),
+    device_info: str = Form(None),
+
+    image: UploadFile = File(...)
+):
+    # 1. nom unique
+    filename = f"{uuid.uuid4()}.jpg"
+
+    file_bytes = await image.read()
+
+    # --- TRAITEMENT DE L'IMAGE ---
+    # 1. Ouvrir l'image depuis les bytes
+    img = Image.open(io.BytesIO(file_bytes))
+
+    if img.mode != "RGB":
+        img = img.convert("RGB")
 
 
-# @router.post("/predict-base64")
-# def predict_base64(data: Base64Image):
-#     try:
-#         image_data = base64.b64decode(data.image)
-#         image = Image.open(BytesIO(image_data)).convert("RGB")
-#     except Exception:
-#         raise HTTPException(status_code=400, detail="Invalid base64 image")
+    # 2. Redimensionner (256x256)
+    # L'utilisation de LANCZOS garantit une meilleure qualité après réduction
+    img = img.resize(IMG_SIZE, Image.Resampling.LANCZOS)
 
-#     result = detector.predict(image)
-#     return JSONResponse(content=result)
+    # 3. Convertir l'image traitée en bytes pour Supabase
+    buffer = io.BytesIO()
+    # On force le format JPEG (ou utilisez img.format)
+    img.save(buffer, format="JPEG", quality=85)
+    resized_bytes = buffer.getvalue()
+
+    # 3. upload Supabase (Utilisez resized_bytes au lieu de file_bytes)
+    path = f"{plant_type}/{filename}"
+
+    supabase.storage.from_("leaf-images").upload(
+        path,
+        resized_bytes,
+        {
+            "content-type": "image/jpeg",
+            "upsert": "true"
+        }
+    )
+
+    # 4. URL publique
+    image_url = supabase.storage.from_("leaf-images").get_public_url(path)
+
+    # 5. save DB
+    supabase.table("leaf_images").insert({
+        "plant_type": plant_type,
+        "disease_label": disease_label,
+        "health_status": health_status,
+        "gps_lat": gps_lat,
+        "gps_lon": gps_lon,
+        "location_name": location_name,
+        "collector_id": collector_id,
+        "device_info": device_info,
+        "image_url": image_url,
+        "created_at": datetime.utcnow().isoformat()
+    }).execute()
+
+    return {
+        "message": "Image uploaded and resized successfully",
+        "image_url": image_url
+    }
+
+@router.get("/leaf_images")
+async def get_all_leaf_images():
+    
+    response = supabase.table("leaf_images").select("*").execute()
+
+    return {
+        "count": len(response.data),
+        "data": response.data
+    }
+
+@router.get("/leaf_image")
+async def get_leaf_image(image_url: str):
+    return RedirectResponse(image_url)
