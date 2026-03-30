@@ -4,4 +4,6 @@ app/models
 app/models-cleaned
 **.env
 venv
-  
+app/__pycache__
+app/classifiers/__pycache__
+app/services/__pycache__
