@@ -1,6 +1,9 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+load_dotenv() # Load variables from .env
 
 from routes import router  # importe ton router
 
@@ -22,8 +25,12 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # changer pour prod
-    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://zaliapp.vercel.app"
+    ],
+    allow_credentials=False,  # Must be False when not using specific credentials
     allow_methods=["*"],
     allow_headers=["*"],
 )

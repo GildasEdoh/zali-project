@@ -126,24 +126,78 @@ Dense(num_classes, softmax)
 
 ## 🚀 Quick Start
 
-### Installation
+### Prerequisites
 
-```bash
-# Clone repository
-git clone https://github.com/yourusername/plant-disease-detection.git
-cd plant-disease-detection
+- **Python**: Recommended version **3.11** or **3.12**. (Note: Python 3.14+ may have compatibility issues with current deep learning libraries).
+- **Virtual Environment**: It is highly recommended to use a virtual environment for dependency isolation.
 
-# Install dependencies
-pip install tensorflow numpy pandas matplotlib seaborn scikit-learn
-```
+### Installation & Setup
 
-### Training on Kaggle
+1. **Clone the repository**:
+   ```bash
+   git clone <repository_url>
+   cd zali-backend
+   ```
 
-1. Upload the notebook `hierarchical_plant_disease_detection.ipynb` to Kaggle
-2. Add PlantVillage dataset
-3. Add your Stage 1 plant classifier model
-4. Enable GPU accelerator
-5. Run all cells
+2. **Create and Activate Virtual Environment**:
+   
+   **Windows (PowerShell)**:
+   ```powershell
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1
+   ```
+
+   **Windows (Git Bash / MINGW64)**:
+   ```bash
+   python -m venv venv
+   source venv/Scripts/activate
+   ```
+
+   **macOS / Linux**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   ```
+
+   > **Note for Python 3.14 users on Windows**: There is a known bug where venv creation fails with "Unable to copy venvlauncher.exe". If you encounter this, use the venv Python binary directly without activation (see step 2 in *Running the Application* below).
+
+3. **Install Dependencies**:
+   ```bash
+   pip install -r app/requirements.txt
+   ```
+
+### Running the Application
+
+1. **Navigate to the app directory**:
+   ```bash
+   cd app
+   ```
+
+2. **Start the FastAPI server** (with venv activated):
+   ```bash
+   python -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+   **Alternatively, if venv activation fails (Python 3.14 bug), run directly with the venv Python binary:**
+
+   *PowerShell:*
+   ```powershell
+   ..\venv\Scripts\python.exe -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+   *Git Bash:*
+   ```bash
+   ../venv/Scripts/python.exe -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+   ```
+
+The API will now be available at `http://localhost:8000`. You can access the automatic documentation at `http://localhost:8000/docs`.
+
+## 🏗️ Technical Stack
+
+- **Framework**: FastAPI
+- **Deep Learning Library**: **PyTorch** (using `.pth` models)
+- **Computer Vision**: PIL (Pillow), Torchvision
+- **Server**: Uvicorn
 
 ### Inference
 
